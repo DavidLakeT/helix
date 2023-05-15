@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+service MonitorService {
+    rpc Heartbeat (HeartbeatRequest) returns (HeartbeatOkResponse) {}
+    rpc InstanceMetrics (InstanceMetricsRequest) returns (InstanceMetricsOkResponse) {}
+}
+
+message HeartbeatRequest {}
+
+message HeartbeatOkResponse {}
+
+message InstanceMetricsRequest {
+    float cpu_load = 1;
+    float http_load = 2;
+}
+
+message InstanceMetricsOkResponse {}
