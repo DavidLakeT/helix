@@ -1,5 +1,8 @@
+import os
 import boto3
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
 
 def list_instances(autoscaling_client):
     response = autoscaling_client.describe_auto_scaling_groups(AutoScalingGroupNames=[auto_scaling_group_name])
@@ -44,7 +47,20 @@ def get_metrics(cloudwatch_client, instance_id):
     return metric_results
 
 if __name__ == "__main__":
-    session = boto3.Session(region_name='us-east-1')
+
+    load_dotenv()
+
+    access_key = os.environ.get('AWS_ACCESS_KEY')
+    secret_key = os.environ.get('AWS_SECRET_KEY')
+    session_token = os.environ.get("AWS_SESSION_TOKEN")
+
+    session = boto3.Session(
+        region_name='us-east-1',
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+        aws_session_token=session_token
+    )
+
     autoscaling_client = session.client('autoscaling')
     cloudwatch_client = session.client('cloudwatch')
 
