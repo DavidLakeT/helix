@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package protos;
+
 service MonitorService {
     rpc Heartbeat (HeartbeatRequest) returns (HeartbeatOkResponse) {}
     rpc InstanceMetrics (InstanceMetricsRequest) returns (InstanceMetricsOkResponse) {}
@@ -9,9 +11,8 @@ message HeartbeatRequest {}
 
 message HeartbeatOkResponse {}
 
-message InstanceMetricsRequest {
-    float cpu_load = 1;
-    float http_load = 2;
-}
+message InstanceMetricsRequest {}
 
-message InstanceMetricsOkResponse {}
+message InstanceMetricsOkResponse {
+    float cpu_load = 1;
+}
