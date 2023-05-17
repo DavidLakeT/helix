@@ -51,6 +51,10 @@ def create_instance(name):
     )
 
 
+def delete_instance(instance_id):
+    return client.terminate_instances(InstanceIds=[instance_id])
+
+
 def attach_instance(instance_id, group_name):
     return autoscaling_client.attach_instances(
         InstanceIds=[instance_id],
@@ -58,14 +62,23 @@ def attach_instance(instance_id, group_name):
         )
 
 
-list_instances()
-print("\n")
+def detach_instance(instance_id, group_name):
+    return autoscaling_client.detach_instances(
+        InstanceIds=[instance_id],
+        AutoScalingGroupName=group_name,
+        ShouldDecrementDesiredCapacity=True
+        )
 
-instance = create_instance('test_intanceE')
-instance_id = instance['Instances'][0]['InstanceId']
-client.get_waiter('instance_running').wait(InstanceIds=[instance_id])
 
-list_instances()
+# instance_id = 'i-0839fdda4191d0619'
+# group_name = 'Proyecto2 ScalingGroup'
+# list_instances()
+# print("\n")
+# instance = create_instance('test_intance2')
+# instance_id = instance['Instances'][0]['InstanceId']
+# client.get_waiter('instance_running').wait(InstanceIds=[instance_id])
+# list_instances()
+# response = attach_instance(instance_id, group_name)
 
-group_name = 'Proyecto2 ScalingGroup'
-response = attach_instance(instance_id, group_name)
+# detach_instance(instance_id, group_name)
+# delete_instance(instance_id)
