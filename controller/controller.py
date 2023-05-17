@@ -1,4 +1,5 @@
 import boto3
+from instance_manager import list_instances, create_instance, delete_instance, attach_instance, detach_instance
 
 access_key = 'ASIA2JWTJAFBYHHO6PPF'
 secret_key = 'zco+T1lLfWPJKcCAhwAlF9vhTZmg0U4sVE+BXLUA'
@@ -20,55 +21,6 @@ autoscaling_client = boto3.client(
     aws_session_token=session_token,
     region_name=region,
 )
-
-
-def list_instances():
-    response = client.describe_instances()
-
-    for reservation in response['Reservations']:
-        for instance in reservation['Instances']:
-            if 'Tags' in instance:
-                for tag in instance['Tags']:
-                    if tag['Key'] == 'Name':
-                        print("Nombre de la instancia:", tag['Value'])
-            else:
-                print("Nombre de la instancia: (Sin nombre)")
-
-
-def create_instance(name):
-    return client.run_instances(
-        MinCount=1,
-        MaxCount=1,
-        ImageId='ami-0557a15b87f6559cf',
-        InstanceType='t2.micro',
-        KeyName='vockey',
-        SecurityGroupIds=['default'],
-        UserData='',
-        TagSpecifications=[{
-            'ResourceType': 'instance',
-            'Tags': [{'Key': 'Name', 'Value': name}]
-        }]
-    )
-
-
-def delete_instance(instance_id):
-    return client.terminate_instances(InstanceIds=[instance_id])
-
-
-def attach_instance(instance_id, group_name):
-    return autoscaling_client.attach_instances(
-        InstanceIds=[instance_id],
-        AutoScalingGroupName=group_name
-        )
-
-
-def detach_instance(instance_id, group_name):
-    return autoscaling_client.detach_instances(
-        InstanceIds=[instance_id],
-        AutoScalingGroupName=group_name,
-        ShouldDecrementDesiredCapacity=True
-        )
-
 
 # instance_id = 'i-0839fdda4191d0619'
 # group_name = 'Proyecto2 ScalingGroup'
