@@ -1,14 +1,8 @@
-def list_instances(client):
-    response = client.describe_instances()
-
-    for reservation in response['Reservations']:
-        for instance in reservation['Instances']:
-            if 'Tags' in instance:
-                for tag in instance['Tags']:
-                    if tag['Key'] == 'Name':
-                        print("Nombre de la instancia:", tag['Value'])
-            else:
-                print("Nombre de la instancia: (Sin nombre)")
+def list_instances(client, group_name):
+    response = client.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[group_name]
+    )
+    return response['AutoScalingGroups'][0]['Instances']
 
 
 def create_instance(client, name):
