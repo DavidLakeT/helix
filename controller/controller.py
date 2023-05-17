@@ -13,6 +13,14 @@ client = boto3.client(
     region_name=region,
 )
 
+autoscaling_client = boto3.client(
+    'autoscaling',
+    aws_access_key_id=access_key,
+    aws_secret_access_key=secret_key,
+    aws_session_token=session_token,
+    region_name=region,
+)
+
 
 def list_instances():
     response = client.describe_instances()
@@ -27,40 +35,37 @@ def list_instances():
                 print("Nombre de la instancia: (Sin nombre)")
 
 
-list_instances()
+def create_instance(name):
+    return client.run_instances(
+        MinCount=1,
+        MaxCount=1,
+        ImageId='ami-0557a15b87f6559cf',
+        InstanceType='t2.micro',
+        KeyName='vockey',
+        SecurityGroupIds=['default'],
+        UserData='',
+        TagSpecifications=[{
+            'ResourceType': 'instance',
+            'Tags': [{'Key': 'Name', 'Value': name}]
+        }]
+    )
 
-instance = client.run_instances(
-    MinCount=1,
-    MaxCount=1,
-    ImageId='ami-0557a15b87f6559cf',
-    InstanceType='t2.micro',
-    KeyName='vockey',
-    SecurityGroupIds=['default'],
-    UserData='''#!/bin/bash
-                # Incluye cualquier configuración adicional que desees ejecutar en la instancia al inicio
-                echo "Configuración adicional"''',
-    TagSpecifications=[{
-        'ResourceType': 'instance',
-        'Tags': [{'Key': 'Name', 'Value': 'test_instanceC'}]
-    }]
-)
+
+def attach_instance(instance_id, group_name):
+    return autoscaling_client.attach_instances(
+        InstanceIds=[instance_id],
+        AutoScalingGroupName=group_name
+        )
+
+
+list_instances()
 print("\n")
-instance_id = instance['Instances'][0]['InstanceId']
-list_instances()
 
+instance = create_instance('test_intanceE')
+instance_id = instance['Instances'][0]['InstanceId']
 client.get_waiter('instance_running').wait(InstanceIds=[instance_id])
 
-autoscaling_client = boto3.client(
-    'autoscaling',
-    aws_access_key_id=access_key,
-    aws_secret_access_key=secret_key,
-    aws_session_token=session_token,
-    region_name=region,
-)
+list_instances()
 
 group_name = 'Proyecto2 ScalingGroup'
-
-response = autoscaling_client.attach_instances(
-    InstanceIds=[instance_id],
-    AutoScalingGroupName=group_name
-    )
+response = attach_instance(instance_id, group_name)
