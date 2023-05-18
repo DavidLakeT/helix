@@ -1,13 +1,21 @@
 import boto3
-from instance_manager import list_instances, create_instance, delete_instance, attach_instance, detach_instance
+import random
+import time
+from instance_manager import new_instance, delete_instance, cleaner
 
-access_key = 'ASIA2JWTJAFBYHHO6PPF'
-secret_key = 'zco+T1lLfWPJKcCAhwAlF9vhTZmg0U4sVE+BXLUA'
-session_token = 'FwoGZXIvYXdzECAaDLq9LyNQPUxobabgOyLIAYSMsTShG+JRZKKp3M+VkQxEaQKZ1UzCOYHUPzGSJQe23WSeCks1QJlsKP8TouzefZr3kGmWDW/HPWe0zRyvMfEA4hfPU1HRFnAMnMzb9mn5J/MR6xVwYDkaxlxJRjf09FjNEpsVNTWdRlTElmKd3WF09CWrkshfLX/p4jkhdPKAf5PnIKq4tPc/I2DQkM/NLSC214KStp1ENlSS01xbPrdYa1x8m4rC39EkwG7dQJjAnQpWjr+emPmrWkUIpYoWFzmQG2TiHZBgKMCFkKMGMi2JsSDiNIL5V/QRyv9UZLnkQ3CTR5haOa4///8Y29rRLItI0KTb6Sazj3PBtKg='
+access_key = 'ASIA2JWTJAFB57L2S7AZ'
+secret_key = '+aSPnyTspSwYZ1sRqb3pnAJWVXP7xMM1UBUYiViU'
+session_token = 'FwoGZXIvYXdzEDgaDHI/yCMEjOvLGDIWeyLIAaIUUCs/5WAXzZvBf7xZQYQ6hDakNSNbOQPjP1qLgk1q0tStbdR/SSxvKbwC7PIqg8nbICrGHaC3MploPwXeC2ZH0TWfMm8XHFzW/m1wFFff8obKa/KpAh13TBE8n1hVybhRmcXwq22UH62kbRZE5IH7z9pDtu36nE2kxNmBLhTsJlnbJtavjUsD0adNvFCaF4CMUO5Rt6sAuc7AirPsU/F14z+D7XwYROJOl61InpRfan2vaBRiLsTOK0gkQmgIix+O1FDN6zj1KKu2laMGMi2/FBoPS6VVyg/G46/6h7AAPZ+TqBf3IuY224PcbghBrnsJSS0l7oSidXtzQYo='
 region = 'us-east-1'
 
 group_name = 'Proyecto2 ScalingGroup'
-instance_id = ''
+instance_id = 'i-0c815d2e545a64860'
+cpu_upper_limit = 0.7
+cpu_lower_limit = 0.3
+max_instances = 5
+min_instances = 2
+current_instances = 0
+instance_list = []
 
 ec2_client = boto3.client(
     'ec2',
@@ -25,20 +33,24 @@ autoscaling_client = boto3.client(
     region_name=region,
 )
 
-# list_instances()
-# print("\n")
-# instance = create_instance(ec2_client, 'test_intance3')
-# instance_id = instance['Instances'][0]['InstanceId']
-# ec2_client.get_waiter('instance_running').wait(InstanceIds=[instance_id])
-# list_instances()
-# response = attach_instance(autoscaling_client, instance_id, group_name)
+while True:
+    cpu_avg = random.random()
+    print("CPU average: " + str(cpu_avg) + "\n")
+    if cpu_avg > cpu_upper_limit and current_instances < max_instances:
 
-# detach_instance(instance_id, group_name)
-# delete_instance(instance_id)
+        print("Creamos nueva instancia\n")
+        instance, _ = new_instance(ec2_client, autoscaling_client, "", group_name)
+        instance_list.append(instance)
+        current_instances += 1
+        print("Instancias activas: " + str(current_instances) + "\n")
 
-# instances = list_instances(autoscaling_client, group_name)
+    if cpu_avg < cpu_lower_limit and current_instances > min_instances:
 
-'''for instance in instances:
-    instance_id = instance['InstanceId']
-    instance_state = instance['LifecycleState']
-    print(f"Instance ID: {instance_id}, State: {instance_state}")'''
+        print("Eliminamos una instancia\n")
+        instance_to_delete = instance_list.pop(0)
+        delete_instance(ec2_client, autoscaling_client, instance_to_delete, group_name)
+        current_instances -= 1
+        print("Instancias activas: " + str(current_instances) + "\n")
+
+    print("-------------------------------------------------")
+    time.sleep(10)
