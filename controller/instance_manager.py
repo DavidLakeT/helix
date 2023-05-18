@@ -58,3 +58,9 @@ def cleaner(ec2_client, autoscaling_client, group_name):
     instances = list_instances(autoscaling_client, group_name)
     for instance in instances:
         delete_instance(ec2_client, autoscaling_client, instance['InstanceId'], group_name)
+
+
+def instance_setup(ec2_client, autoscaling_client, group_name):
+    id1, _ = new_instance(ec2_client, autoscaling_client, '', group_name)
+    id2, _ = new_instance(ec2_client, autoscaling_client, '', group_name)
+    return (id1, id2)

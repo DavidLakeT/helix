@@ -1,7 +1,7 @@
 import boto3
 import random
 import time
-from instance_manager import new_instance, delete_instance, cleaner
+from instance_manager import new_instance, delete_instance, cleaner, instance_setup
 
 access_key = 'ASIA2JWTJAFB57L2S7AZ'
 secret_key = '+aSPnyTspSwYZ1sRqb3pnAJWVXP7xMM1UBUYiViU'
@@ -14,7 +14,6 @@ cpu_upper_limit = 0.7
 cpu_lower_limit = 0.3
 max_instances = 5
 min_instances = 2
-current_instances = 0
 instance_list = []
 
 ec2_client = boto3.client(
@@ -34,6 +33,11 @@ autoscaling_client = boto3.client(
 )
 
 cleaner(ec2_client, autoscaling_client, group_name)
+id1, id2 = instance_setup(ec2_client, autoscaling_client, group_name)
+instance_list.append(id1)
+instance_list.append(id2)
+current_instances = 2
+
 
 while True:
     cpu_avg = random.random()
@@ -46,7 +50,7 @@ while True:
         current_instances += 1
         print("Instancias activas: " + str(current_instances) + "\n")
 
-    if cpu_avg < cpu_lower_limit and current_instances > min_instances:
+    elif cpu_avg < cpu_lower_limit and current_instances > min_instances:
 
         print("Eliminamos una instancia\n")
         instance_to_delete = instance_list.pop(0)
