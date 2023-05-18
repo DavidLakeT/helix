@@ -1,10 +1,3 @@
-def list_instances(client, group_name):
-    response = client.describe_auto_scaling_groups(
-            AutoScalingGroupNames=[group_name]
-    )
-    return response['AutoScalingGroups'][0]['Instances']
-
-
 def create_instance(client):
     instance = client.run_instances(
         MinCount=1,

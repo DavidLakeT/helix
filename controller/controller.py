@@ -1,18 +1,20 @@
+from instance_manager import create_instance, terminate_instance, cleaner, instance_setup
+from dotenv import load_dotenv
+import os
 import boto3
 import random
 import time
-from instance_manager import create_instance, terminate_instance, cleaner, instance_setup
 
-access_key = 'ASIA2JWTJAFB57L2S7AZ'
-secret_key = '+aSPnyTspSwYZ1sRqb3pnAJWVXP7xMM1UBUYiViU'
-session_token = 'FwoGZXIvYXdzEDgaDHI/yCMEjOvLGDIWeyLIAaIUUCs/5WAXzZvBf7xZQYQ6hDakNSNbOQPjP1qLgk1q0tStbdR/SSxvKbwC7PIqg8nbICrGHaC3MploPwXeC2ZH0TWfMm8XHFzW/m1wFFff8obKa/KpAh13TBE8n1hVybhRmcXwq22UH62kbRZE5IH7z9pDtu36nE2kxNmBLhTsJlnbJtavjUsD0adNvFCaF4CMUO5Rt6sAuc7AirPsU/F14z+D7XwYROJOl61InpRfan2vaBRiLsTOK0gkQmgIix+O1FDN6zj1KKu2laMGMi2/FBoPS6VVyg/G46/6h7AAPZ+TqBf3IuY224PcbghBrnsJSS0l7oSidXtzQYo='
-region = 'us-east-1'
+load_dotenv()
+access_key = os.environ.get('AWS_ACCESS_KEY')
+secret_key = os.environ.get('AWS_SECRET_KEY')
+session_token = os.environ.get('AWS_SESSION_TOKEN')
+region = os.environ.get('REGION')
 
-instance_id = 'i-0c815d2e545a64860'
-cpu_lower_limit = 0.3
-cpu_upper_limit = 0.7
-min_instances = 2
-max_instances = 5
+cpu_lower_limit = float(os.environ.get('CPU_LOWER_LIMIT'))
+cpu_upper_limit = float(os.environ.get('CPU_UPPER_LIMIT'))
+min_instances = int(os.environ.get('MIN_INSTNACES'))
+max_instances = int(os.environ.get('MAX_INSTANCES'))
 instance_list = []
 
 ec2_client = boto3.client(
