@@ -21,7 +21,7 @@ def create_instance(client, name):
     )
 
 
-def delete_instance(client, instance_id):
+def terminate_instance(client, instance_id):
     return client.terminate_instances(InstanceIds=[instance_id])
 
 
@@ -38,3 +38,23 @@ def detach_instance(client, instance_id, group_name):
         AutoScalingGroupName=group_name,
         ShouldDecrementDesiredCapacity=True
         )
+
+
+def new_instance(ec2_client, autoscaling_client, name, group_name):
+    instance = create_instance(ec2_client, name)
+    instance_id = instance['Instances'][0]['InstanceId']
+    ec2_client.get_waiter('instance_running').wait(InstanceIds=[instance_id])
+    at_response = attach_instance(autoscaling_client, instance_id, group_name)
+    return (instance_id, at_response)
+
+
+def delete_instance(ec2_client, autoscaling_client, instance_id, group_name):
+    dt_response = detach_instance(autoscaling_client, instance_id, group_name)
+    terminate = terminate_instance(ec2_client, instance_id)
+    return (dt_response, terminate)
+
+
+def cleaner(ec2_client, autoscaling_client, group_name):
+    instances = list_instances(autoscaling_client, group_name)
+    for instance in instances:
+        delete_instance(ec2_client, autoscaling_client, instance['InstanceId'], group_name)

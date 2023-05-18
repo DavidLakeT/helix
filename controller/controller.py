@@ -33,6 +33,8 @@ autoscaling_client = boto3.client(
     region_name=region,
 )
 
+cleaner(ec2_client, autoscaling_client, group_name)
+
 while True:
     cpu_avg = random.random()
     print("CPU average: " + str(cpu_avg) + "\n")
