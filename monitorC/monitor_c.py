@@ -6,7 +6,7 @@ def main():
     while True:
         print("\n------------------------------------\n" +
               "\nCPU: \n")
-        cpu_usage = random.random()
+        cpu_usage = get_number()
         print(cpu_usage)
         time.sleep(2)
 
