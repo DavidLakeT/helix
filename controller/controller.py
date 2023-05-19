@@ -1,9 +1,9 @@
 from instance_manager import create_instance, terminate_instance, cleaner, instance_setup
 from dotenv import load_dotenv
+from monitorS import grpc_client
+import time
 import os
 import boto3
-import random
-import time
 
 load_dotenv()
 access_key = os.environ.get('AWS_ACCESS_KEY')
@@ -32,7 +32,7 @@ instance_list.append(id2)
 current_instances = 2
 
 while True:
-    cpu_avg = random.random()
+    cpu_avg = grpc_client.grpc_service("metrics")
     print("CPU average: " + str(cpu_avg) + "\n")
     if cpu_avg > cpu_upper_limit and current_instances < max_instances:
 
