@@ -10,7 +10,7 @@ class MonitorServiceServicer(monitor_pb2_grpc.MonitorServiceServicer):
         return monitor_pb2.HeartbeatOkResponse(status=True)
 
     def InstanceMetrics(self, request, context):
-        cpu_value = get_number()
+        cpu_value = get_number(prev=request.prev, direction=request.direction)
         return monitor_pb2.InstanceMetricsOkResponse(cpu_load=cpu_value)
 
 

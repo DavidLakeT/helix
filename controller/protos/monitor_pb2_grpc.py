@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from protos import monitor_pb2 as protos_dot_monitor__pb2
+from protos import monitor_pb2 as monitor__pb2
 
 
 class MonitorServiceStub(object):
@@ -16,13 +16,13 @@ class MonitorServiceStub(object):
         """
         self.Heartbeat = channel.unary_unary(
                 '/protos.MonitorService/Heartbeat',
-                request_serializer=protos_dot_monitor__pb2.HeartbeatRequest.SerializeToString,
-                response_deserializer=protos_dot_monitor__pb2.HeartbeatOkResponse.FromString,
+                request_serializer=monitor__pb2.HeartbeatRequest.SerializeToString,
+                response_deserializer=monitor__pb2.HeartbeatOkResponse.FromString,
                 )
         self.InstanceMetrics = channel.unary_unary(
                 '/protos.MonitorService/InstanceMetrics',
-                request_serializer=protos_dot_monitor__pb2.InstanceMetricsRequest.SerializeToString,
-                response_deserializer=protos_dot_monitor__pb2.InstanceMetricsOkResponse.FromString,
+                request_serializer=monitor__pb2.InstanceMetricsRequest.SerializeToString,
+                response_deserializer=monitor__pb2.InstanceMetricsOkResponse.FromString,
                 )
 
 
@@ -46,13 +46,13 @@ def add_MonitorServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Heartbeat': grpc.unary_unary_rpc_method_handler(
                     servicer.Heartbeat,
-                    request_deserializer=protos_dot_monitor__pb2.HeartbeatRequest.FromString,
-                    response_serializer=protos_dot_monitor__pb2.HeartbeatOkResponse.SerializeToString,
+                    request_deserializer=monitor__pb2.HeartbeatRequest.FromString,
+                    response_serializer=monitor__pb2.HeartbeatOkResponse.SerializeToString,
             ),
             'InstanceMetrics': grpc.unary_unary_rpc_method_handler(
                     servicer.InstanceMetrics,
-                    request_deserializer=protos_dot_monitor__pb2.InstanceMetricsRequest.FromString,
-                    response_serializer=protos_dot_monitor__pb2.InstanceMetricsOkResponse.SerializeToString,
+                    request_deserializer=monitor__pb2.InstanceMetricsRequest.FromString,
+                    response_serializer=monitor__pb2.InstanceMetricsOkResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -76,8 +76,8 @@ class MonitorService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/protos.MonitorService/Heartbeat',
-            protos_dot_monitor__pb2.HeartbeatRequest.SerializeToString,
-            protos_dot_monitor__pb2.HeartbeatOkResponse.FromString,
+            monitor__pb2.HeartbeatRequest.SerializeToString,
+            monitor__pb2.HeartbeatOkResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -93,7 +93,7 @@ class MonitorService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/protos.MonitorService/InstanceMetrics',
-            protos_dot_monitor__pb2.InstanceMetricsRequest.SerializeToString,
-            protos_dot_monitor__pb2.InstanceMetricsOkResponse.FromString,
+            monitor__pb2.InstanceMetricsRequest.SerializeToString,
+            monitor__pb2.InstanceMetricsOkResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

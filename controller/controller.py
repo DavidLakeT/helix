@@ -16,6 +16,8 @@ cpu_upper_limit = float(os.environ.get('CPU_UPPER_LIMIT'))
 min_instances = int(os.environ.get('MIN_INSTNACES'))
 max_instances = int(os.environ.get('MAX_INSTANCES'))
 instance_list = []
+cpu_direction = "up"
+cpu_avg = 0.5
 
 ec2_client = boto3.client(
     'ec2',
@@ -25,14 +27,17 @@ ec2_client = boto3.client(
     region_name=region,
 )
 
+print("Deleting all previous instances\n")
 cleaner(ec2_client)
+print("Creating initial instances")
+'''
 id1, id2 = instance_setup(ec2_client)
 instance_list.append(id1)
 instance_list.append(id2)
+'''
 current_instances = 2
-
 while True:
-    cpu_avg = grpc_client.grpc_service("metrics")
+    cpu_avg = grpc_client.grpc_service("metrics", cpu_avg, cpu_direction)
     print("CPU average: " + str(cpu_avg) + "\n")
     if cpu_avg > cpu_upper_limit and current_instances < max_instances:
 
@@ -50,5 +55,10 @@ while True:
         current_instances -= 1
         print("Instancias activas: " + str(current_instances) + "\n")
 
+    if cpu_avg > 0.75:
+        cpu_direction = "down"
+    elif cpu_avg < 0.25:
+        cpu_direction = "up"
+
     print("-------------------------------------------------")
-    time.sleep(15)
+    time.sleep(10)
