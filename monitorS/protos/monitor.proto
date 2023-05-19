@@ -9,7 +9,9 @@ service MonitorService {
 
 message HeartbeatRequest {}
 
-message HeartbeatOkResponse {}
+message HeartbeatOkResponse {
+    bool status = 1;
+}
 
 message InstanceMetricsRequest {}
 

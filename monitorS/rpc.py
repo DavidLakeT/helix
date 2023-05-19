@@ -1,16 +1,18 @@
 import grpc
 from concurrent import futures
 import time
+from protos import monitor_pb2, monitor_pb2_grpc
 
-from monitor.aws import get_metrics
+from monitorS.aws import get_metrics
 
 instance_id = ""
+
 
 class MonitorService(monitor_pb2_grpc.MonitorServiceServicer):
     def Heartbeat(self, request, context):
         response = monitor_pb2.HeartbeatOkResponse()
         return response
-    
+
     def InstanceMetrics(self, request, context):
         global instance_id
         instance_id = "aca_va_el_id"
@@ -20,7 +22,8 @@ class MonitorService(monitor_pb2_grpc.MonitorServiceServicer):
         response.cpu_load = metrics('cpu_load')
 
         return response
-    
+
+
 def serveRpc():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=4))
     monitor_pb2_grpc.add_MonitorServiceServicer_to_server(MonitorService(), server)
@@ -32,6 +35,7 @@ def serveRpc():
             time.sleep(3600)
     except KeyboardInterrupt:
         server.stop(0)
+
 
 if __name__ == '__main__':
     serveRpc()
