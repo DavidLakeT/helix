@@ -1,8 +1,6 @@
 import random
 import time
 import grpc
-import os
-import json
 from protos import monitor_pb2
 from protos import monitor_pb2_grpc
 from concurrent import futures
@@ -15,7 +13,8 @@ class MonitorServiceServicer(monitor_pb2_grpc.MonitorServiceServicer):
 
     def InstanceMetrics(self, request, context):
         print("metrics")
-        return monitor_pb2.InstanceMetricsOkResponse(cpu_load=0.5)
+        cpu_value = get_number()
+        return monitor_pb2.InstanceMetricsOkResponse(cpu_load=cpu_value)
 
 
 def main():
@@ -30,15 +29,29 @@ def main():
     server.wait_for_termination()
 
 
-'''
-def main():
-    while True:
-        print("\n------------------------------------\n" +
-              "\nCPU: \n")
+def get_number(prev=None, direction=None, range=0.1):
+    if prev is None:
         cpu_usage = random.random()
-        print(cpu_usage)
-        time.sleep(1)
-        '''
+        return cpu_usage
+    else:
+        if direction is None:
+            lower_limit = prev - range
+            upper_limit = prev + range
+
+            cpu_usage = random.uniform(lower_limit, upper_limit)
+            return cpu_usage
+        elif direction == "down":
+            lower_limit = prev
+            upper_limit = prev - range
+
+            cpu_usage = random.uniform(lower_limit, upper_limit)
+            return cpu_usage
+        elif direction == "up":
+            lower_limit = prev
+            upper_limit = prev + range
+
+            cpu_usage = random.uniform(lower_limit, upper_limit)
+            return cpu_usage
 
 
 if __name__ == "__main__":
