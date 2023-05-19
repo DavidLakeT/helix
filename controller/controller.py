@@ -30,11 +30,11 @@ ec2_client = boto3.client(
 print("Deleting all previous instances\n")
 cleaner(ec2_client)
 print("Creating initial instances")
-'''
+
 id1, id2 = instance_setup(ec2_client)
 instance_list.append(id1)
 instance_list.append(id2)
-'''
+
 current_instances = 2
 while True:
     cpu_avg = grpc_client.grpc_service("metrics", cpu_avg, cpu_direction)
