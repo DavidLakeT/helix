@@ -21,7 +21,7 @@ def main():
     monitor_pb2_grpc.add_MonitorServiceServicer_to_server(
         MonitorServiceServicer(), server)
 
-    server.add_insecure_port("[::1]")
+    server.add_insecure_port("127.0.0.1:50051")
     server.start()
     server.wait_for_termination()
 

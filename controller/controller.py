@@ -13,7 +13,7 @@ region = os.environ.get('REGION')
 
 cpu_lower_limit = float(os.environ.get('CPU_LOWER_LIMIT'))
 cpu_upper_limit = float(os.environ.get('CPU_UPPER_LIMIT'))
-min_instances = int(os.environ.get('MIN_INSTNACES'))
+min_instances = int(os.environ.get('MIN_INSTANCES'))
 max_instances = int(os.environ.get('MAX_INSTANCES'))
 instance_list = []
 cpu_direction = "up"

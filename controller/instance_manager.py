@@ -2,7 +2,7 @@ def create_instance(client):
     instance = client.run_instances(
         MinCount=1,
         MaxCount=1,
-        ImageId='ami-04f27063c8ae01651',
+        ImageId='ami-060a2d7b6dd28b169',
         InstanceType='t2.micro',
         KeyName='vockey',
         SecurityGroupIds=['default'],

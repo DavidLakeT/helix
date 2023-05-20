@@ -15,7 +15,7 @@ def instance_metrics(stub, nprev, dir):
 
 
 def grpc_service(req, prev=None, direction=None, ips=None):
-    with grpc.insecure_channel('[::1]') as channel:
+    with grpc.insecure_channel('127.0.0.1:50051') as channel:
         stub = monitor_pb2_grpc.MonitorServiceStub(channel)
 
         if req == "heartbeat":
