@@ -62,3 +62,26 @@ while True:
 
     print("-------------------------------------------------")
     time.sleep(10)
+
+'''
+
+Usted está generando constantemente números en MonitorC.
+Esos números se generan a partir de un random que se crea la primera vez. (0.0 a 1.0)
+
+En el MonitorC usted tiene una variable global (dirección), esa dirección por default
+es nula (None). Si usted recibe un rpc "setDirection" que tiene las posibles opciones
+"up", "down" y "none", cuando lo recibe usted actualiza la dirección global (que va a
+ser la que va a utilizar luego en la función GetNumber, por lo que debe eliminar el
+parámetro que tiene actualmente esa función para dirección).
+
+Entonces el Controller sigue recibiendo los números que el MonitorC le está pasando
+(que ya cambiaron de dirección), así ya todos los siguientes serán en una dirección y
+no tiene que estar pidiendo la dirección en cada request y es más fácil testear.
+Eso por la parte del MonitorC. 
+
+--------
+
+Cuando cree una instancia, usted llama al método que tenga para listar las instancias
+y si puede obtenga la fecha de creación, de forma que pueda ver cuál fué la más reciente.
+
+'''
