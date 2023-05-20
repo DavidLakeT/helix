@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import monitor_pb2 as monitor__pb2
+from protos import monitor_pb2 as monitor__pb2
 
 
 class MonitorServiceStub(object):

@@ -1,19 +1,23 @@
-import boto3
-import random
-import time
 from instance_manager import create_instance, terminate_instance, cleaner, instance_setup
+from dotenv import load_dotenv
+from monitorS import grpc_client
+import time
+import os
+import boto3
 
-access_key = 'ASIA2JWTJAFB57L2S7AZ'
-secret_key = '+aSPnyTspSwYZ1sRqb3pnAJWVXP7xMM1UBUYiViU'
-session_token = 'FwoGZXIvYXdzEDgaDHI/yCMEjOvLGDIWeyLIAaIUUCs/5WAXzZvBf7xZQYQ6hDakNSNbOQPjP1qLgk1q0tStbdR/SSxvKbwC7PIqg8nbICrGHaC3MploPwXeC2ZH0TWfMm8XHFzW/m1wFFff8obKa/KpAh13TBE8n1hVybhRmcXwq22UH62kbRZE5IH7z9pDtu36nE2kxNmBLhTsJlnbJtavjUsD0adNvFCaF4CMUO5Rt6sAuc7AirPsU/F14z+D7XwYROJOl61InpRfan2vaBRiLsTOK0gkQmgIix+O1FDN6zj1KKu2laMGMi2/FBoPS6VVyg/G46/6h7AAPZ+TqBf3IuY224PcbghBrnsJSS0l7oSidXtzQYo='
-region = 'us-east-1'
+load_dotenv()
+access_key = os.environ.get('AWS_ACCESS_KEY')
+secret_key = os.environ.get('AWS_SECRET_KEY')
+session_token = os.environ.get('AWS_SESSION_TOKEN')
+region = os.environ.get('REGION')
 
-instance_id = 'i-0c815d2e545a64860'
-cpu_lower_limit = 0.3
-cpu_upper_limit = 0.7
-min_instances = 2
-max_instances = 5
+cpu_lower_limit = float(os.environ.get('CPU_LOWER_LIMIT'))
+cpu_upper_limit = float(os.environ.get('CPU_UPPER_LIMIT'))
+min_instances = int(os.environ.get('MIN_INSTANCES'))
+max_instances = int(os.environ.get('MAX_INSTANCES'))
 instance_list = []
+cpu_direction = "up"
+cpu_avg = 0.5
 
 ec2_client = boto3.client(
     'ec2',
@@ -23,14 +27,17 @@ ec2_client = boto3.client(
     region_name=region,
 )
 
+print("Deleting all previous instances\n")
 cleaner(ec2_client)
+print("Creating initial instances")
+
 id1, id2 = instance_setup(ec2_client)
 instance_list.append(id1)
 instance_list.append(id2)
-current_instances = 2
 
+current_instances = 2
 while True:
-    cpu_avg = random.random()
+    cpu_avg = grpc_client.grpc_service("metrics", cpu_avg, cpu_direction)
     print("CPU average: " + str(cpu_avg) + "\n")
     if cpu_avg > cpu_upper_limit and current_instances < max_instances:
 
@@ -48,5 +55,33 @@ while True:
         current_instances -= 1
         print("Instancias activas: " + str(current_instances) + "\n")
 
+    if cpu_avg > 0.75:
+        cpu_direction = "down"
+    elif cpu_avg < 0.25:
+        cpu_direction = "up"
+
     print("-------------------------------------------------")
-    time.sleep(15)
+    time.sleep(10)
+
+'''
+
+Usted está generando constantemente números en MonitorC.
+Esos números se generan a partir de un random que se crea la primera vez. (0.0 a 1.0)
+
+En el MonitorC usted tiene una variable global (dirección), esa dirección por default
+es nula (None). Si usted recibe un rpc "setDirection" que tiene las posibles opciones
+"up", "down" y "none", cuando lo recibe usted actualiza la dirección global (que va a
+ser la que va a utilizar luego en la función GetNumber, por lo que debe eliminar el
+parámetro que tiene actualmente esa función para dirección).
+
+Entonces el Controller sigue recibiendo los números que el MonitorC le está pasando
+(que ya cambiaron de dirección), así ya todos los siguientes serán en una dirección y
+no tiene que estar pidiendo la dirección en cada request y es más fácil testear.
+Eso por la parte del MonitorC. 
+
+--------
+
+Cuando cree una instancia, usted llama al método que tenga para listar las instancias
+y si puede obtenga la fecha de creación, de forma que pueda ver cuál fué la más reciente.
+
+'''

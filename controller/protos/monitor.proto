@@ -9,9 +9,14 @@ service MonitorService {
 
 message HeartbeatRequest {}
 
-message HeartbeatOkResponse {}
+message HeartbeatOkResponse {
+    bool status = 1;
+}
 
-message InstanceMetricsRequest {}
+message InstanceMetricsRequest {
+    float prev = 1;
+    string direction = 2;
+}
 
 message InstanceMetricsOkResponse {
     float cpu_load = 1;
